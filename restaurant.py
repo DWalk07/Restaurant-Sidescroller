@@ -49,21 +49,39 @@ cook_event = pygame.USEREVENT + 1
 
 #player class, taking in position and sprite 
 class player(pygame.sprite.Sprite):
-        def __init__(self, startingX=100, startingY=400):
+        def __init__(self, startingX=100, startingY=325):
             self.x = startingX
             self.y = startingY
             self.speed = 7
             self.image = pygame.image.load('pixel_chef.png')
-            self.image = pygame.transform.scale(self.image, (50,150))
+            self.image = pygame.transform.scale(self.image, (60,225))
             self.image.set_colorkey((255,255,255)) #makes white background transparent
+            self.direction = "right"
 
         def move(self):
             keys = pygame.key.get_pressed()
             #left and right movement on left and right keys or a and d keys
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                self.x -= self.speed
+                if plr.x > 100 or current_screen == restaurant_image:
+                    #stops player from moving left if about to go off screen when there isn't a screen to the left
+                    self.x -= self.speed
+                    
+                    #flips the player image around if they turn
+                    if self.direction == "right":
+                        self.direction = "left"
+                        self.image = pygame.transform.flip(self.image, True, False)
+                        self.image.set_colorkey((255,255,255))
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                self.x += self.speed
+                if plr.x < 750 or current_screen == kitchen_image:
+                    #stops player from moving left if about to go off screen when there isn't a screen to the right
+                    self.x += self.speed
+                    
+                    #flips the player image around if they turn
+                    if self.direction == "left":
+                        self.direction = "right"
+                        self.image = pygame.transform.flip(self.image, True, False)
+                        self.image.set_colorkey((255,255,255))
+            
 
         def draw(self):
             screen.blit(self.image, (self.x,self.y))
@@ -96,10 +114,11 @@ class food(pygame.sprite.Sprite):
 
 class dish(pygame.sprite.Sprite):
     #a class for the dishes the player cooks
-    def __init__(self, name, image, quality = None):
+    def __init__(self, name, image, requirements, quality = None):
         self.name = name
         self.image = pygame.image.load(image)
         self.image = pygame.transform.scale(self.image, (70,70))
+        self.requirments = requirements #will be a list of ingreedients and the quantity of each
         #quality goes "burnt" --> "good" --> "great"
         self.quality = quality
     
@@ -141,10 +160,10 @@ class cooking_appliance():
         self.quality = quality
         if self.type == 'stove':
             self.image = pygame.image.load('pixel_stove.png')
-            self.image = pygame.transform.scale(self.image, (50,50))#scales to the height and width of the hitbox
+            self.image = pygame.transform.scale(self.image, (hitbox.width,hitbox.height))#scales to the height and width of the hitbox
         elif self.type == 'oven':
             self.image = pygame.image.load('pixel_oven.png')
-            self.image = pygame.transform.scale(self.image, (50,50))
+            self.image = pygame.transform.scale(self.image, (hitbox.width,hitbox.height))
 
     def draw(self):
         screen.blit(self.image, self.hitbox)
@@ -153,7 +172,6 @@ class cooking_appliance():
 class rhythm_block(pygame.sprite.Sprite):
     def __init__(self, character, time_window, x, y, lifetime = 0, solved = False):
         #the rhythm blocks for minigame  
-        #self.image = pygame.Surface((50,50), pygame.SRCALPHA) #creates a transparent surface for the block
         super().__init__()
         self.character = character
         self.time_window = time_window
@@ -174,7 +192,7 @@ class rhythm_block(pygame.sprite.Sprite):
         pygame.draw.circle(screen, (185,180,175), (self.x,self.y), self.radius) #outer circle
         pygame.draw.circle(screen, (self.red, self.green, self.blue), (self.x,self.y), 20) #inner ring
         text = self.font.render(self.character, True, (255, 255, 255))
-        screen.blit(text, (self.x - 10, self.y - 10))
+        screen.blit(text, (self.x - 8, self.y - 18))
         self.lifetime += 1
         #print("draw")
         self.radius -= 0.15
@@ -209,15 +227,16 @@ def screenChange(next_screen):
 plr = player()
 
 #initializing stovetops
-stove1 = cooking_appliance('stove', pygame.Rect(100, 300, 50, 50), 1)
-stove2 = cooking_appliance('stove', pygame.Rect(200, 300, 50, 50), 1)
-stove3 = cooking_appliance('stove', pygame.Rect(300, 300, 50, 50), 1)
-stove4 = cooking_appliance('stove', pygame.Rect(400, 300, 50, 50), 1)
-oven1 = cooking_appliance('oven', pygame.Rect(100, 450, 50, 50), 1)
-oven2 = cooking_appliance('oven', pygame.Rect(200, 450, 50, 50), 1)
-oven3 = cooking_appliance('oven', pygame.Rect(300, 450, 50, 50), 1)
-oven4 = cooking_appliance('oven', pygame.Rect(400, 450, 50, 50), 1)
-appliances = [stove1, stove2, stove3, stove4, oven1, oven2, oven3, oven4]
+# stove1 = cooking_appliance('stove', pygame.Rect(100, 300, 50, 50), 1)
+# stove2 = cooking_appliance('stove', pygame.Rect(200, 300, 50, 50), 1)
+# stove3 = cooking_appliance('stove', pygame.Rect(300, 300, 50, 50), 1)
+# stove4 = cooking_appliance('stove', pygame.Rect(400, 300, 50, 50), 1)
+oven1 = cooking_appliance('oven', pygame.Rect(168, 368, 130, 130), 1)
+# oven2 = cooking_appliance('oven', pygame.Rect(200, 450, 50, 50), 1)
+# oven3 = cooking_appliance('oven', pygame.Rect(300, 450, 50, 50), 1)
+# oven4 = cooking_appliance('oven', pygame.Rect(400, 450, 50, 50), 1)
+#appliances = [stove1, stove2, stove3, stove4, oven1, oven2, oven3, oven4]
+appliances = [oven1]
 #hitboxes = [stove1.hitbox, stove2.hitbox, stove3.hitbox, stove4.hitbox, oven1.hitbox, oven2.hitbox, oven3.hitbox, oven4.hitbox]
 
 meat_food = food('meat', 10, "pixel_meat.png")
@@ -241,8 +260,6 @@ while True:
 
     screen.blit(current_screen, (0,0))
     plr.move()
-    
-    plr.draw()
 
     #room change logic
     if plr.x < 0 and current_screen == restaurant_image:
@@ -322,6 +339,8 @@ while True:
     veggie_food.draw(100, 100)
     carrot_food.draw(100, 150)
     fruit_food.draw(100, 200)
+
+    plr.draw()
 
     pygame.display.update()
     clock.tick(60)
