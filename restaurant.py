@@ -266,7 +266,7 @@ while True:
         #left side of the screen when in the restaurant takes you to the kitchen
         print("should go to kitchen")
         screenChange("kitchen")
-        plr.x = 775
+        plr.x = 750
     elif plr.x > 800 and current_screen == kitchen_image:
         #right side of the screen when in the kitchen takes you to the restaurant
         print("should go to restaurant")
