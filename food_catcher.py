@@ -11,6 +11,8 @@ def run_food_catcher(screen, clock, time_remaining):
     HEIGHT = 600
     #screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Food Catcher Game")
+    background = pygame.image.load("grocery.jpg")
+    background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
     game_time = pygame.time.get_ticks()
     # Clock
@@ -101,9 +103,9 @@ def run_food_catcher(screen, clock, time_remaining):
 
     def show_text():
         """Displays score and lives."""
-        score_text = font.render(f"Score: {score}", True, BLACK)
-        lives_text = font.render(f"Lives: {lives}", True, BLACK)
-        time_remaining_text = font.render(f"Time Remaining: {time_remaining}", True, BLACK)
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        lives_text = font.render(f"Lives: {lives}", True, WHITE)
+        time_remaining_text = font.render(f"Time Remaining: {time_remaining}", True, WHITE)
         screen.blit(score_text, (20, 20))
         screen.blit(lives_text, (WIDTH - 120, 20))
         screen.blit(time_remaining_text, (WIDTH // 2 - 20, 20))
@@ -114,7 +116,7 @@ def run_food_catcher(screen, clock, time_remaining):
     while running:
         print(screen)
         clock.tick(FPS)
-        screen.fill(WHITE)
+        screen.blit(background, (0, 0))
 
         #decrease time remaining every second
         if game_time + 1000 <= pygame.time.get_ticks():
@@ -171,8 +173,19 @@ def run_food_catcher(screen, clock, time_remaining):
         # Game over
         if lives <= 0:
             game_over_text = font.render("GAME OVER", True, RED)
-            final_score_text = font.render(f"Final Score: {score}", True, BLACK)
-            returning_text = font.render("returning to restaurant", True, BLACK)
+            final_score_text = font.render(f"Final Score: {score}", True, YELLOW)
+            returning_text = font.render("returning to restaurant", True, YELLOW)
+
+            # Black box size
+            box_width = 420
+            box_height = 200
+
+            # Center the box on the screen
+            box_x = WIDTH // 2 - box_width // 2
+            box_y = HEIGHT // 2 - box_height // 2
+
+            # Draw black box
+            pygame.draw.rect(screen, BLACK, (box_x, box_y, box_width, box_height))
 
             screen.blit(game_over_text, (WIDTH // 2 - 90, HEIGHT // 2 - 40))
             screen.blit(final_score_text, (WIDTH // 2 - 100, HEIGHT // 2))
