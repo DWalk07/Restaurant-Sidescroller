@@ -26,7 +26,7 @@ def run_game_handler(screen, clock, volume=0.5):
             #             on_menu = False
 
         if current == "restaurant":
-            current, time_remaining = run_restaurant(screen,clock, time_remaining, veg, meat, fruit)
+            current, time_remaining, volume = run_restaurant(screen,clock, time_remaining, volume, veg, meat, fruit)
         elif current == "food_catcher":
             current, time_remaining, veg, meat, fruit = run_food_catcher(screen,clock, time_remaining)
     return "menu"
