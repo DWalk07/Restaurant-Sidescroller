@@ -3,7 +3,7 @@ import random
 import sys
 
 #pygame.init()
-def run_restaurant(screen, clock, time_remaining, meat_amount=0, veggie_amount=0, fruit_amount=0):
+def run_restaurant(screen, clock, time_remaining, volume, meat_amount=0, veggie_amount=0, fruit_amount=0):
     window_size = (800,600)
     #screen = pygame.display.set_mode(window_size)
     pygame.display.set_caption('Restaurant SS')
@@ -74,6 +74,39 @@ def run_restaurant(screen, clock, time_remaining, meat_amount=0, veggie_amount=0
     menu_escape = menu_body_font.render("press the esc key to exit", True, (255,255,255), (15,15,15))
     menu_sound_text = menu_body_font.render("Sound",True, (255,255,255), (15,15,15))# a slider representing volume will be there
         
+    #menu volume functions -- same as in main menu
+    def draw_button(text, x, y, width, height):
+        mouse_pos = pygame.mouse.get_pos()
+        button_rect = pygame.Rect(x, y, width, height)
+
+        if button_rect.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, (40, 90, 130), button_rect)
+        else:
+            pygame.draw.rect(screen, (70, 130, 180), button_rect)
+
+        button_text = general_font.render(text, True, (255,255,255))
+        screen.blit(
+            button_text,
+            (
+                x + width // 2 - button_text.get_width() // 2,
+                y + height // 2 - button_text.get_height() // 2
+            )
+        )
+
+        return button_rect
+
+
+    def draw_volume_bar(x, y, width, height, volume):
+        pygame.draw.rect(screen, (180, 180, 180), (x, y, width, height))
+
+        filled_width = int(width * volume)
+        pygame.draw.rect(screen, (70, 130, 180), (x, y, filled_width, height))
+
+        volume_text = general_font.render(f"Volume: {int(volume * 100)}%", True, (0,0,0))
+        screen.blit(volume_text, (x, y - 35))
+
+    
+    
     clock = pygame.time.Clock()
 
 
@@ -287,19 +320,35 @@ def run_restaurant(screen, clock, time_remaining, meat_amount=0, veggie_amount=0
                 pygame.quit()
                 sys.exit()
         
-            if event.type == pygame.MOUSEBUTTONDOWN and on_menu == False:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     mouse_pos = event.pos
-                    for appliance in appliances:
-                        if appliance.hitbox.collidepoint(mouse_pos) and current_screen == kitchen_image:
-                            if cooking == None:
-                                #the cooking variable saves the item you're cooking with 
-                                cooking = appliance
-                    #changes the screen when the rectangle in the top right is clicked on
-                    if catcher_button.collidepoint(mouse_pos) and cooking == None:
-                        #returning this string signals to the game handler that you want to switch gamemodes
-                        return "food_catcher", time_remaining
-            
+                    if on_menu == False:
+                        for appliance in appliances:
+                            if appliance.hitbox.collidepoint(mouse_pos) and current_screen == kitchen_image:
+                                if cooking == None:
+                                    #the cooking variable saves the item you're cooking with 
+                                    cooking = appliance
+                        #changes the screen when the rectangle in the top right is clicked on
+                        if catcher_button.collidepoint(mouse_pos) and cooking == None:
+                            #returning this string signals to the game handler that you want to switch gamemodes
+                            return "food_catcher", time_remaining, volume
+
+                    if on_menu:
+                        print("clicked on menu")
+                        global volume_up_button
+                        global volume_down_button
+                        if volume_up_button.collidepoint(event.pos):
+                            volume += 0.1
+                            if volume > 1:
+                                volume = 1
+                            pygame.mixer.music.set_volume(volume)    
+                        elif volume_down_button.collidepoint(event.pos):
+                            volume -= 0.1
+                            if volume < 0:
+                                volume = 0
+                            pygame.mixer.music.set_volume(volume)
+
             #show menu when esc is pressed
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -415,6 +464,28 @@ def run_restaurant(screen, clock, time_remaining, meat_amount=0, veggie_amount=0
                         block.delete_block(False)      
         elif on_menu:
             show_menu(screen)
+
+            #draw volume control
+            #global volume_down_button
+            #global volume_up_button
+            volume_down_button = draw_button("-", 250, 370, 60, 50)
+            volume_up_button = draw_button("+", 490, 370, 60, 50)
+            #for event in pygame.event.get():
+                #if event.type == pygame.MOUSEBUTTONDOWN:
+                    #print(event.pos)
+                    # if volume_up_button.collidepoint(event.pos):
+                    #     volume += 0.1
+                    #     if volume > 1:
+                    #         volume = 1
+                    #     pygame.mixer.music.set_volume(volume)    
+                    # elif volume_down_button.collidepoint(event.pos):
+                    #     print("volume", volume)
+                    #     volume -= 0.1
+                    #     if volume < 0:
+                    #         volume = 0
+                    #     pygame.mixer.music.set_volume(volume)
+
+            draw_volume_bar(320, 385, 160, 20, volume)
 
         screen.blit(time_remaining_text, (340, 40))
 
