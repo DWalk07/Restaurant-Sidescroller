@@ -11,8 +11,8 @@ def run_food_catcher(screen, clock, time_remaining):
     HEIGHT = 600
     #screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Food Catcher Game")
-    background = pygame.image.load("grocery.jpg")
-    background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+    #background = pygame.image.load("grocery.jpg")
+    #background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
     game_time = pygame.time.get_ticks()
     # Clock
@@ -35,7 +35,7 @@ def run_food_catcher(screen, clock, time_remaining):
         {"name": "apple", "color": RED, "points": 1},
         {"name": "banana", "color": YELLOW, "points": 2},
         {"name": "broccoli", "color": GREEN, "points": 3},
-        {"name": "burger", "color": BROWN, "points": 5}
+        {"name": "meat", "color": RED, "points": 5}
     ]
 
     current_food = random.choice(foods)
@@ -88,11 +88,13 @@ def run_food_catcher(screen, clock, time_remaining):
             pygame.draw.circle(screen, GREEN, (x + 28, y + 16), 10)
             pygame.draw.rect(screen, BROWN, (x + 15, y + 18, 8, 15))
 
-        elif food["name"] == "burger":
-            pygame.draw.rect(screen, BROWN, (x, y + 8, food_size, 10))
-            pygame.draw.rect(screen, GREEN, (x, y + 18, food_size, 6))
-            pygame.draw.rect(screen, RED, (x, y + 24, food_size, 6))
-            pygame.draw.rect(screen, BROWN, (x, y + 30, food_size, 8))
+        elif food["name"] == "meat":
+            #pygame.draw.rect(screen, BROWN, (x, y + 8, food_size, 10))
+            #pygame.draw.rect(screen, GREEN, (x, y + 18, food_size, 6))
+            pygame.draw.rect(screen, RED, (x, y + 8, food_size*1.25, 15))
+            pygame.draw.rect(screen, (175,175,175), (x-10, y + 8, food_size/3, 10))
+            pygame.draw.rect(screen, (175,175,175), (x+38, y + 8, food_size/3, 10))
+            #pygame.draw.rect(screen, BROWN, (x, y + 30, food_size, 8))
 
     def reset_food():
         """Resets food to the top and randomly chooses a new food."""
@@ -103,20 +105,27 @@ def run_food_catcher(screen, clock, time_remaining):
 
     def show_text():
         """Displays score and lives."""
-        score_text = font.render(f"Score: {score}", True, WHITE)
-        lives_text = font.render(f"Lives: {lives}", True, WHITE)
-        time_remaining_text = font.render(f"Time Remaining: {time_remaining}", True, WHITE)
+        score_text = font.render(f"Score: {score}", True, BLACK)
+        lives_text = font.render(f"Lives: {lives}", True, BLACK)
+        mc_text = font.render(f"Meat Collected: {meat_collected}", True, BLACK)
+        vc_text = font.render(f"Veggies Collected: {veggies_collected}", True, BLACK)
+        fc_text = font.render(f"Fruit Collected: {fruit_collected}", True, BLACK)
+        time_remaining_text = font.render(f"Time Remaining: {time_remaining}", True, BLACK)
         screen.blit(score_text, (20, 20))
         screen.blit(lives_text, (WIDTH - 120, 20))
         screen.blit(time_remaining_text, (WIDTH // 2 - 20, 20))
+        screen.blit(mc_text, (20, 125))
+        screen.blit(vc_text, (20, 175))
+        screen.blit(fc_text, (20, 225))
 
     # Main game loop
     running = True
 
     while running:
-        print(screen)
+        
         clock.tick(FPS)
-        screen.blit(background, (0, 0))
+        #screen.blit(background, (0, 0))
+        screen.fill((255,255,255))
 
         #decrease time remaining every second
         if game_time + 1000 <= pygame.time.get_ticks():
@@ -147,11 +156,11 @@ def run_food_catcher(screen, clock, time_remaining):
         # Check if cart catches food
         if cart_rect.colliderect(food_rect):
             #increase the specific amount of food collected for the restaurant ingreedients
-            if current_food["name"] == "apple" or ["name"] == "banana":
+            if current_food["name"] == "apple" or current_food["name"] == "banana":
                 fruit_collected += 1
             elif current_food["name"] == "broccoli":    
                 veggies_collected += 1
-            elif current_food["name"] == "burger":
+            elif current_food["name"] == "meat":
                 meat_collected += 1    
             score += current_food["points"]
             food_x, food_y, current_food = reset_food()
@@ -194,7 +203,7 @@ def run_food_catcher(screen, clock, time_remaining):
             pygame.display.update()
             pygame.time.wait(3000)
             #switch back to restaurant screen once done
-            return "restaurant", time_remaining, veggies_collected, meat_collected, fruit_collected
+            return "restaurant", time_remaining, veggies_collected, meat_collected, fruit_collected, score
             #running = False
 
         pygame.display.update()
