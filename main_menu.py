@@ -46,7 +46,7 @@ def draw_button(text, x, y, width, height):
     else:
         pygame.draw.rect(screen, BLUE, button_rect)
 
-    button_text = font.render(text, True, WHITE)
+    button_text = font.render(text, True, BLACK)
     screen.blit(
         button_text,
         (
